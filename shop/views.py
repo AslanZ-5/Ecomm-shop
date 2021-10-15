@@ -9,7 +9,7 @@ def index(request):
     if item_name != '' and item_name is not None:
         products = products.filter(title__icontains=item_name)
     #paginator code
-    paginator = Paginator(products,2)
+    paginator = Paginator(products,3)
     page = request.GET.get('page')
     products = paginator.get_page(page)
     return render(request,'shop/index.html',{'products':products})
