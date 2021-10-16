@@ -77,8 +77,7 @@
 
 </body>
 <script type="text/javascript">
-    console.log('hello world');
-    if(localStorage.getItem('card') == null){
+    if(localStorage.getItem('cart') == null){
         var cart = {};
     }
     else{
@@ -94,7 +93,8 @@
         else{
             cart[item_id] = 1
         }
-        console.log(cart)
+        console.log(cart);
+        localStorage.setItem('cart',JSON.stringify(cart));
     });
 
 </script>
