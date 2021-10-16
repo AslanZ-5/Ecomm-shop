@@ -30,7 +30,7 @@
       <div class="navbar-nav">
         <a class="nav-link active" aria-current="page" href="#">Home</a>
         <a class="nav-link" href="#">Features</a>
-        <a class="nav-link" href="#">Pricing</a>
+        <a id="cart" class="nav-link" href="#">Cart(0)</a>
         <a class="nav-link disabled">Disabled</a>
       </div>
     </div>
@@ -117,6 +117,9 @@
         }
         console.log(cart);
         localStorage.setItem('cart',JSON.stringify(cart));
+        document.getElementById("cart").innerHTML = "Cart(" + Object.keys(cart).length + ")";
+
+
     });
 
 </script>
