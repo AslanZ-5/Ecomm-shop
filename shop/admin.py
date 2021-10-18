@@ -12,20 +12,20 @@ class ImageResolutionNotice(ModelForm):
         super().__init__(*args, **kwargs)
         self.fields[
             'image'].help_text = mark_safe(
-            f"<span style='color:orange;font-size:14px;'>Upload an image with the minimum resolution {Product.min_resolution[0]}x{Product.min_resolution[1]}</span> ")
+            f"<span style='color:orange;font-size:14px;'>In case of loading image with size more than  {Product.max_resolution[0]}x{Product.max_resolution[1]} it'll be cropped</span> ")
 
-    def clean_image(self):
-        image = self.cleaned_data['image']
-        img = Image.open(image)
-        min_width, min_height = Product.min_resolution
-        max_width, max_height = Product.max_resolution
-        if image.size > Product.max_image_size:
-            raise ValidationError("The image size shouldn't be more than 3mb")
-        if img.width < min_width or img.height < min_height:
-            raise ValidationError("The image resolution is less than the minimum")
-        if img.width > max_width or img.height > max_height:
-            raise ValidationError("The image resolution is more than the minimum")
-        return image
+    # def clean_image(self):
+    #     image = self.cleaned_data['image']
+    #     img = Image.open(image)
+    #     min_width, min_height = Product.min_resolution
+    #     max_width, max_height = Product.max_resolution
+    #     if image.size > Product.max_image_size:
+    #         raise ValidationError("The image size shouldn't be more than 3mb")
+    #     if img.width < min_width or img.height < min_height:
+    #         raise ValidationError("The image resolution is less than the minimum")
+    #     if img.width > max_width or img.height > max_height:
+    #         raise ValidationError("The image resolution is more than the minimum")
+    #     return image
 
 
 class LaptopAdmin(admin.ModelAdmin):

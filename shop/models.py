@@ -3,7 +3,9 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from PIL import Image
-
+from io import BytesIO
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from sys import getsizeof
 
 class MaxResolutionError(Exception):
     pass
@@ -46,7 +48,7 @@ class Category(models.Model):
 
 class Product(models.Model):
     min_resolution = (199, 199)
-    max_resolution = (500, 500)
+    max_resolution = (800, 800)
     max_image_size = 3145728
 
     class Meta:
@@ -62,15 +64,28 @@ class Product(models.Model):
     def __str__(self):
         return self.title
 
+    # verify whether the image size is valid else raise error
+    # def save(self, *args, **kwargs):
+    #     image = self.image
+    #     img = Image.open(image)
+    #     min_width, min_height = self.min_resolution
+    #     max_width, max_height = self.max_resolution
+    #     if img.width < min_width or img.height < min_height:
+    #         raise MinResolutionError("The image resolution is less than the minimum")
+    #     if img.width > max_width or img.height > max_height:
+    #         raise MaxResolutionError("The image resolution is more than the minimum")
+    #     super().save(*args,**kwargs)
     def save(self, *args, **kwargs):
         image = self.image
         img = Image.open(image)
-        min_width, min_height = self.min_resolution
-        max_width, max_height = self.max_resolution
-        if img.width < min_width or img.height < min_height:
-            raise MinResolutionError("The image resolution is less than the minimum")
-        if img.width > max_width or img.height > max_height:
-            raise MaxResolutionError("The image resolution is more than the minimum")
+        new_img = img.convert('RGB')
+        resized_img = new_img.resize((300,300),Image.ANTIALIAS)
+        filestream = BytesIO()
+        resized_img.save(filestream,'JPEG',quality=90)
+        name = '{}.{}'.format(*self.image.name.split('.'))
+        self.image = InMemoryUploadedFile(
+            filestream, 'ImageField', name, 'jpeg/image', getsizeof(filestream),None
+        )
         super().save(*args,**kwargs)
 
 
