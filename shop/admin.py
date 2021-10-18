@@ -11,13 +11,16 @@ class ImageResolutionNotice(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields[
-            'image'].help_text = mark_safe(f"<span style='color:red;font-size:14px;'>Upload an image with the minimum resolution {Product.min_resolution[0]}x{Product.min_resolution[1]}</span> ")
+            'image'].help_text = mark_safe(
+            f"<span style='color:orange;font-size:14px;'>Upload an image with the minimum resolution {Product.min_resolution[0]}x{Product.min_resolution[1]}</span> ")
 
     def clean_image(self):
         image = self.cleaned_data['image']
         img = Image.open(image)
         min_width, min_height = Product.min_resolution
         max_width, max_height = Product.max_resolution
+        if image.size > Product.max_image_size:
+            raise ValidationError("The image size shouldn't be more than 3mb")
         if img.width < min_width or img.height < min_height:
             raise ValidationError("The image resolution is less than the minimum")
         if img.width > max_width or img.height > max_height:

@@ -47,6 +47,7 @@ class Category(models.Model):
 class Product(models.Model):
     min_resolution = (199, 199)
     max_resolution = (500, 500)
+    max_image_size = 3145728
 
     class Meta:
         abstract = True
@@ -70,7 +71,7 @@ class Product(models.Model):
             raise MinResolutionError("The image resolution is less than the minimum")
         if img.width > max_width or img.height > max_height:
             raise MaxResolutionError("The image resolution is more than the minimum")
-        return image
+        super().save(*args,**kwargs)
 
 
 class CartProduct(models.Model):
