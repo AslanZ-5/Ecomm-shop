@@ -3,6 +3,7 @@ from .models import *
 from django import forms
 from django.forms import ModelChoiceField, ModelForm
 from django.core.exceptions import ValidationError
+from django.utils.safestring import mark_safe
 from PIL import Image
 
 
@@ -13,7 +14,7 @@ class ImageResolutionNotice(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields[
-            'image'].help_text = f"Upload an image with the minimum resolution {self.min_resolution[0]}x{self.min_resolution[1]} "
+            'image'].help_text = mark_safe(f"<span style='color:red;'>Upload an image with the minimum resolution {self.min_resolution[0]}x{self.min_resolution[1]}</span> ")
 
     def clean_image(self):
         image = self.cleaned_data['image']
