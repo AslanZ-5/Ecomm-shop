@@ -6,6 +6,13 @@ from PIL import Image
 from io import BytesIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from sys import getsizeof
+from django.urls import reverse
+
+
+def get_product_url(obj, viewname):
+    ct_model = obj.__class__.meta.model.name
+    return reverse(viewname, kwargs={'ct_model': ct_model, 'slug': obj.slug})
+
 
 class MaxResolutionError(Exception):
     pass
@@ -53,7 +60,7 @@ class Product(models.Model):
 
     class Meta:
         abstract = True
-
+    slug = models.SlugField(unique=True,default=None)
     category = models.ForeignKey(Category, verbose_name='Product Category', on_delete=models.CASCADE)
     title = models.CharField(max_length=200, verbose_name='Product Name')
     price = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='Product Price')
@@ -79,14 +86,14 @@ class Product(models.Model):
         image = self.image
         img = Image.open(image)
         new_img = img.convert('RGB')
-        resized_img = new_img.resize((300,300),Image.ANTIALIAS)
+        resized_img = new_img.resize((300, 300), Image.ANTIALIAS)
         filestream = BytesIO()
-        resized_img.save(filestream,'JPEG',quality=90)
+        resized_img.save(filestream, 'JPEG', quality=90)
         name = '{}.{}'.format(*self.image.name.split('.'))
         self.image = InMemoryUploadedFile(
-            filestream, 'ImageField', name, 'jpeg/image', getsizeof(filestream),None
+            filestream, 'ImageField', name, 'jpeg/image', getsizeof(filestream), None
         )
-        super().save(*args,**kwargs)
+        super().save(*args, **kwargs)
 
 
 class CartProduct(models.Model):
@@ -132,6 +139,9 @@ class Laptop(Product):
     def __str__(self):
         return f'{self.category.name} {self.title}'
 
+    def get_absolute_url(self):
+        return get_product_url(self, 'product_detail')
+
 
 class SmartPhone(Product):
     diagonal = models.CharField(max_length=255)
@@ -147,3 +157,6 @@ class SmartPhone(Product):
 
     def __str__(self):
         return f'{self.category.name} {self.title}'
+
+    def get_absolute_url(self):
+        return get_product_url(self, 'product_detail')
