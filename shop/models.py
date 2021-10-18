@@ -2,6 +2,15 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
+from PIL import Image
+
+
+class MaxResolutionError(Exception):
+    pass
+
+
+class MinResolutionError(Exception):
+    pass
 
 
 class LatestProductsManager:
@@ -15,10 +24,11 @@ class LatestProductsManager:
             model_product = ct_model.model_class()._base_manager.all().order_by('-id')[:5]
             products.extend(model_product)
         if with_respect_to:
-            ct_model = ContentType.objects.filter(model = with_respect_to)
+            ct_model = ContentType.objects.filter(model=with_respect_to)
             if ct_model.exists():
                 if with_respect_to in args:
-                    return sorted(products, key=lambda x: x.__class__._meta.model_name.startswith(with_respect_to),reverse=True)
+                    return sorted(products, key=lambda x: x.__class__._meta.model_name.startswith(with_respect_to),
+                                  reverse=True)
         return products
 
 
@@ -35,6 +45,9 @@ class Category(models.Model):
 
 
 class Product(models.Model):
+    min_resolution = (199, 199)
+    max_resolution = (500, 500)
+
     class Meta:
         abstract = True
 
@@ -48,10 +61,21 @@ class Product(models.Model):
     def __str__(self):
         return self.title
 
+    def save(self, *args, **kwargs):
+        image = self.image
+        img = Image.open(image)
+        min_width, min_height = self.min_resolution
+        max_width, max_height = self.max_resolution
+        if img.width < min_width or img.height < min_height:
+            raise MinResolutionError("The image resolution is less than the minimum")
+        if img.width > max_width or img.height > max_height:
+            raise MaxResolutionError("The image resolution is more than the minimum")
+        return image
+
 
 class CartProduct(models.Model):
     user = models.ForeignKey('Customer', verbose_name='Customer', on_delete=models.CASCADE)
-    cart = models.ForeignKey('Cart',  on_delete=models.CASCADE, related_name='related_products')
+    cart = models.ForeignKey('Cart', on_delete=models.CASCADE, related_name='related_products')
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
@@ -107,5 +131,3 @@ class SmartPhone(Product):
 
     def __str__(self):
         return f'{self.category.name} {self.title}'
-
-

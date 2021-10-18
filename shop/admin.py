@@ -8,19 +8,16 @@ from PIL import Image
 
 
 class ImageResolutionNotice(ModelForm):
-    min_resolution = (199, 199)
-    max_resolution = (500,500)
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields[
-            'image'].help_text = mark_safe(f"<span style='color:red;'>Upload an image with the minimum resolution {self.min_resolution[0]}x{self.min_resolution[1]}</span> ")
+            'image'].help_text = mark_safe(f"<span style='color:red;font-size:14px;'>Upload an image with the minimum resolution {Product.min_resolution[0]}x{Product.min_resolution[1]}</span> ")
 
     def clean_image(self):
         image = self.cleaned_data['image']
         img = Image.open(image)
-        min_width, min_height = self.min_resolution
-        max_width, max_height = self.max_resolution
+        min_width, min_height = Product.min_resolution
+        max_width, max_height = Product.max_resolution
         if img.width < min_width or img.height < min_height:
             raise ValidationError("The image resolution is less than the minimum")
         if img.width > max_width or img.height > max_height:
