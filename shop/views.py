@@ -1,5 +1,5 @@
 from django.shortcuts import render
 
 
-def index(reqeust):
-    pass
+def index(request):
+    return render(request,'shop/base.html')
