@@ -2,6 +2,8 @@ from django.contrib import admin
 from .models import *
 from django import forms
 from django.forms import ModelChoiceField, ModelForm
+from django.core.exceptions import ValidationError
+from PIL import Image
 
 
 class ImageResolutionNotice(ModelForm):
@@ -11,7 +13,13 @@ class ImageResolutionNotice(ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['image'].help_text = f"Upload an image with the minimum resolution {self.resolution[0]}x{self.resolution[1]} "
 
-
+    def clean_image(self):
+        image = self.cleaned_data['image']
+        img = Image.open(image)
+        min_width,min_height = self.resolution
+        if img.width < min_width or img.height < min_height:
+            raise ValidationError("The image resolution is less than the minimum")
+        return image
 class LaptopAdmin(admin.ModelAdmin):
     form = ImageResolutionNotice
 
