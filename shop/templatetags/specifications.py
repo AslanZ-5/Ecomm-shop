@@ -1,5 +1,6 @@
 from django import template
 from django.utils.safestring import mark_safe
+from shop.models import SmartPhone
 register = template.Library()
 
 TABLE_HEAD = """
@@ -52,4 +53,9 @@ def get_product_spac(product,model_name):
 @register.filter
 def product_spec(product):
     model_name = product.__class__._meta.model_name
+    if isinstance(product,SmartPhone):
+        if not product.sd:
+            PRODUCT_SPEC['smartphone'].pop('sd_volume_max')
+        else:
+            PRODUCT_SPEC['smartphone']['sd_volume_max'] == 'sd_volume_max'
     return mark_safe(TABLE_HEAD + get_product_spac(product,model_name) + TABLE_TAIL)
