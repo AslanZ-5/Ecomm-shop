@@ -39,6 +39,7 @@ class LaptopAdmin(admin.ModelAdmin):
 
 class SmartPhoneAdmin(admin.ModelAdmin):
     form = ImageResolutionNotice
+    change_form_template = 'shop/admin.html'
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == 'category':
