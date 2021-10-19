@@ -1,15 +1,24 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-</head>
-<body>
-{{product.title}}
-{{product.category}}
-{{product.price}}
-</body>
-</html>
+{% extends 'shop/base.html' %}
+
+{% block content %}
+    <nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+    <li class="breadcrumb-item"><a href="#">{{product.category.name}}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{product.title}}</li>
+  </ol>
+</nav>
+<div class="row">
+
+    <div class="col-md-4">
+        <img src="{{product.image.url}} " class="img-fluid">
+    </div>
+    <div class="col-md-8">
+        <h3>{{product.title}}</h3>
+        <p>Price: {{product.price}}</p>
+        <p>Description: {{product.description}}</p>
+    </div>
+
+
+</div>
+{% endblock %}
