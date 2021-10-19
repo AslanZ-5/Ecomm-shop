@@ -153,7 +153,7 @@ class SmartPhone(Product):
     accum_volume = models.CharField(max_length=255)
     time_without_charge = models.CharField(max_length=255)
     sd = models.BooleanField(default=True)
-    sd_volume_max = models.CharField(max_length=255, verbose_name='Maximum internal memory')
+    sd_volume_max = models.CharField(max_length=255, null=True,blank=True,verbose_name='Maximum internal memory')
     main_camera_mp = models.CharField(max_length=255)
     frontal_camera_mp = models.CharField(max_length=255)
 
