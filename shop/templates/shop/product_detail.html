@@ -18,6 +18,15 @@
         <p>Price: {{product.price}}</p>
         <p>Description: {{product.description}}</p>
     </div>
+    <div >
+        {% if product.category.name == 'laptop' %}
+        {% include 'shop/laptop_specification.html' %}
+        {% endif %}
+        {% if product.category.name == 'smartphone' %}
+        {% include 'shop/smarphone_specification.html' %}
+        {% endif %}
+
+    </div>
 
 
 </div>
