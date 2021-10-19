@@ -1,5 +1,5 @@
 {% extends 'shop/base.html' %}
-
+{% load specifications %}
 {% block content %}
     <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
@@ -19,6 +19,7 @@
         <p>Description: {{product.description}}</p>
     </div>
     <div >
+        {{product|product_spec}}
         {% if product.category.name == 'laptop' %}
         {% include 'shop/laptop_specification.html' %}
         {% endif %}
