@@ -7,7 +7,23 @@ from django.utils.safestring import mark_safe
 from PIL import Image
 
 
-class ImageResolutionNotice(ModelForm):
+class SmartphoneAdminForms(ModelForm):
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.fields[
+            'image'].help_text = mark_safe(
+            f"<span style='color:orange;font-size:14px;'>In case of loading image with size more than  {Product.max_resolution[0]}x{Product.max_resolution[1]} it'll be cropped</span> ")
+        instance = kwargs.get('instance')
+        if not instance.sd:
+            self.fields['sd_volume_max'].widget.attrs.update({'readonly':True,'style':'background:lightgray'})
+
+    def clean(self):
+        if not self.cleaned_data['sd']:
+            self.cleaned_data['sd_volume_max'] = None
+        return self.cleaned_data
+
+
+class LaptopAdminForms(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields[
@@ -29,7 +45,7 @@ class ImageResolutionNotice(ModelForm):
 
 
 class LaptopAdmin(admin.ModelAdmin):
-    form = ImageResolutionNotice
+    form = LaptopAdminForms
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == 'category':
@@ -38,7 +54,7 @@ class LaptopAdmin(admin.ModelAdmin):
 
 
 class SmartPhoneAdmin(admin.ModelAdmin):
-    form = ImageResolutionNotice
+    form = SmartphoneAdminForms
     change_form_template = 'shop/admin.html'
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
