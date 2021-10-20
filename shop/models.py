@@ -8,6 +8,8 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from sys import getsizeof
 from django.urls import reverse
 
+def get_models_for_count(*model_names):
+    return [models.Count(model_name) for model_name in model_names]
 
 def get_product_url(obj, viewname):
     ct_model = obj.__class__.meta.model.name
@@ -45,9 +47,23 @@ class LatestProducts:
     objects = LatestProductsManager()
 
 
+
+class CategoryManager(models.Manager):
+    count_names = {
+        'laptop':'laptop__count',
+        'smartphone':'smartphone__count',
+    }
+    def get_queryset(self):
+        return super().get_queryset()
+    def get_categories_for_left_sidebar(self):
+        models = get_models_for_count('laptop','smartphone')
+        qs = list(self.get_queryset().annotate(*models).values())
+        return [ dict(name=i['name'],slug=i['slug'],count=i[self.count_names[i['name']]]) for i in qs]
+
 class Category(models.Model):
     name = models.CharField(max_length=255, verbose_name='Category Name')
     slug = models.SlugField(unique=True)
+    objects = CategoryManager()
 
     def __str__(self):
         return self.name
@@ -60,7 +76,8 @@ class Product(models.Model):
 
     class Meta:
         abstract = True
-    slug = models.SlugField(unique=True,default=None)
+
+    slug = models.SlugField(unique=True, default=None)
     category = models.ForeignKey(Category, verbose_name='Product Category', on_delete=models.CASCADE)
     title = models.CharField(max_length=200, verbose_name='Product Name')
     price = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='Product Price')
@@ -111,7 +128,7 @@ class CartProduct(models.Model):
 
 class Cart(models.Model):
     owner = models.ForeignKey('Customer', verbose_name='Customer', on_delete=models.CASCADE)
-    products = models.ManyToManyField(CartProduct,blank=True, related_name='related_cart')
+    products = models.ManyToManyField(CartProduct, blank=True, related_name='related_cart')
     total_product = models.PositiveIntegerField(default=0)
     final_price = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='Total Price')
     in_order = models.BooleanField(default=False)
@@ -153,7 +170,7 @@ class SmartPhone(Product):
     accum_volume = models.CharField(max_length=255)
     time_without_charge = models.CharField(max_length=255)
     sd = models.BooleanField(default=True)
-    sd_volume_max = models.CharField(max_length=255, null=True,blank=True,verbose_name='Maximum internal memory')
+    sd_volume_max = models.CharField(max_length=255, null=True, blank=True, verbose_name='Maximum internal memory')
     main_camera_mp = models.CharField(max_length=255)
     frontal_camera_mp = models.CharField(max_length=255)
 
