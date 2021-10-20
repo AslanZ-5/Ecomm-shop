@@ -57,8 +57,9 @@ class CategoryManager(models.Manager):
         return super().get_queryset()
     def get_categories_for_left_sidebar(self):
         models = get_models_for_count('laptop','smartphone')
-        qs = list(self.get_queryset().annotate(*models).values())
-        return [ dict(name=i['name'],slug=i['slug'],count=i[self.count_names[i['name']]]) for i in qs]
+        qs = list(self.get_queryset().annotate(*models))
+        data = [ dict( name=i.name, url=i.get_absolute_url(),count=getattr(i, self.count_names[i.name])) for i in qs]
+        return data
 
 class Category(models.Model):
     name = models.CharField(max_length=255, verbose_name='Category Name')
@@ -67,6 +68,9 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('category_detail',kwargs={'slug':self.slug})
 
 
 class Product(models.Model):
