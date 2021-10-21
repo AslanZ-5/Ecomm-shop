@@ -1,0 +1,28 @@
+{% extends 'shop/base.html' %}
+
+{% block content %}
+<h1 style="color:red">{{cart}}</h1>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Products Name</th>
+      <th scope="col">Image</th>
+      <th scope="col">Price</th>
+      <th scope="col">Total Products</th>
+      <th scope="col">Final Price</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for item in cart.products.all %}
+    <tr>
+      <th scope="row">{{ item.content_object.title }}</th>
+      <td class="w-25"><img src="{{item.content_object.image.url}}" class="img-fluid"></td>
+      <td>{{item.content_object.price}}</td>
+      <td>{{item.qty}}</td>
+      <td>{{item.final_price}}</td>
+    </tr>
+{% endfor %}
+
+  </tbody>
+</table>
+{% endblock %}
