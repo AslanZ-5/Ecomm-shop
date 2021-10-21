@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views.generic import DetailView, View
-from .models import Laptop, SmartPhone, Category
+from .models import Laptop, SmartPhone, Category,LatestProducts
 from .mixins import CategoryDetailMixin
 
 # def index(request):
@@ -9,7 +9,14 @@ class BaseView(View):
 
     def get(self,request,*args,**kwargs):
         categories = Category.objects.get_categories_for_left_sidebar()
-        return render(request, 'shop/base.html', {'categories': categories})
+        products = LatestProducts.objects.get_products_for_models(
+            'laptop','smartphone',with_respect_to='laptop'
+        )
+        context = {
+            'categories': categories,
+            'products': products,
+        }
+        return render(request, 'shop/base.html', context)
 
 
 class ProductDetailView(CategoryDetailMixin,DetailView):
