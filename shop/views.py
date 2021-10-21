@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from django.views.generic import DetailView, View
-from .models import Laptop, SmartPhone, Category, LatestProducts, Customer, Cart
+from .models import Laptop, SmartPhone, Category, LatestProducts, Customer, Cart, CartProduct
 from .mixins import CategoryDetailMixin
 from django.http import HttpResponseRedirect
+from django.contrib.contenttypes.models import ContentType
 
 
 # def index(request):
@@ -54,8 +55,18 @@ class CategoryDetailView(CategoryDetailMixin, DetailView):
 
 class AddCartView(View):
     def get(self, request, *args, **kwargs):
-        print(kwargs.get('ct_model'))
-        print(kwargs.get('slug'))
+        ct_model = kwargs.get('ct_model')  # getting model name from url request
+        product_slug = kwargs.get('slug')  # getting product's slug from url request
+        content_type = ContentType.objects.get(model=ct_model)  # getting model through model name
+        product = content_type.model_class().objects.get(
+            slug=product_slug)  # getting product from product's model via product slug
+        customer = Customer.objects.get(user=request.user) # getting customer via current user
+        cart = Cart.objects.get(owner=customer, in_order=False) # getting cart by owner which is customer
+        cart_product = CartProduct.objects.create(
+            user=cart.owner, cart=cart, content_type=product
+        ) # creating cart product by data which we got above
+        cart.objects.add(cart_product)
+
         return HttpResponseRedirect('/cart/')
 
 
