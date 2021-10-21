@@ -3,10 +3,13 @@ from django.views.generic import DetailView, View
 from .models import Laptop, SmartPhone, Category
 from .mixins import CategoryDetailMixin
 
-def index(request):
-    categories = Category.objects.get_categories_for_left_sidebar()
-    return render(request, 'shop/base.html', {'categories': categories})
+# def index(request):
 
+class BaseView(View):
+
+    def get(self,request,*args,**kwargs):
+        categories = Category.objects.get_categories_for_left_sidebar()
+        return render(request, 'shop/base.html', {'categories': categories})
 
 
 class ProductDetailView(CategoryDetailMixin,DetailView):
