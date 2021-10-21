@@ -17,7 +17,10 @@
         <h3>{{product.title}}</h3>
         <p>Price: {{product.price}}</p>
         <p>Description: {{product.description}}</p>
+            <hr>
+    <a href="{% url 'add_to_cart' ct_model=ct_model slug=product.slug %}"><button class="btn btn-danger">Add to Cart</button></a>
     </div>
+
     <div >
         {{product|product_spec}}
 <!--        {% if product.category.name == 'laptop' %}-->

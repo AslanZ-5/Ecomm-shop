@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.views.generic import DetailView, View
 from .models import Laptop, SmartPhone, Category, LatestProducts, Customer, Cart
 from .mixins import CategoryDetailMixin
+from django.http import HttpResponseRedirect
 
 
 # def index(request):
@@ -16,6 +17,7 @@ class BaseView(View):
         context = {
             'categories': categories,
             'products': products,
+
         }
         return render(request, 'shop/base.html', context)
 
@@ -35,6 +37,12 @@ class ProductDetailView(CategoryDetailMixin, DetailView):
     template_name = 'shop/product_detail.html'
     slug_url_kwarg = 'slug'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['ct_model'] = self.model._meta.model_name
+
+        return context
+
 
 class CategoryDetailView(CategoryDetailMixin, DetailView):
     model = Category
@@ -42,6 +50,13 @@ class CategoryDetailView(CategoryDetailMixin, DetailView):
     context_object_name = 'category'
     template_name = 'shop/category_detail.html'
     slug_url_kwarg = 'slug'
+
+
+class AddCartView(View):
+    def get(self, request, *args, **kwargs):
+        print(kwargs.get('ct_model'))
+        print(kwargs.get('slug'))
+        return HttpResponseRedirect('/cart/')
 
 
 class CartView(View):
