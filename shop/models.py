@@ -8,8 +8,10 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from sys import getsizeof
 from django.urls import reverse
 
+
 def get_models_for_count(*model_names):
     return [models.Count(model_name) for model_name in model_names]
+
 
 def get_product_url(obj, viewname):
     ct_model = obj.__class__.meta.model.name
@@ -47,19 +49,21 @@ class LatestProducts:
     objects = LatestProductsManager()
 
 
-
 class CategoryManager(models.Manager):
     count_names = {
-        'laptop':'laptop__count',
-        'smartphone':'smartphone__count',
+        'laptop': 'laptop__count',
+        'smartphone': 'smartphone__count',
     }
+
     def get_queryset(self):
         return super().get_queryset()
+
     def get_categories_for_left_sidebar(self):
-        models = get_models_for_count('laptop','smartphone')
+        models = get_models_for_count('laptop', 'smartphone')
         qs = list(self.get_queryset().annotate(*models))
-        data = [ dict( name=i.name, url=i.get_absolute_url(),count=getattr(i, self.count_names[i.name])) for i in qs]
+        data = [dict(name=i.name, url=i.get_absolute_url(), count=getattr(i, self.count_names[i.name])) for i in qs]
         return data
+
 
 class Category(models.Model):
     name = models.CharField(max_length=255, verbose_name='Category Name')
@@ -70,7 +74,7 @@ class Category(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('category_detail',kwargs={'slug':self.slug})
+        return reverse('category_detail', kwargs={'slug': self.slug})
 
 
 class Product(models.Model):
@@ -128,6 +132,10 @@ class CartProduct(models.Model):
 
     def __str__(self):
         return f'Product: {self.content_object.title}'
+
+    def save(self, *args, **kwargs):
+        self.final_price = self.qty * self.content_object.price
+        super().save(*args, **kwargs)
 
 
 class Cart(models.Model):

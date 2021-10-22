@@ -1,6 +1,7 @@
 from django import template
 from django.utils.safestring import mark_safe
 from shop.models import SmartPhone
+
 register = template.Library()
 
 TABLE_HEAD = """
@@ -22,13 +23,13 @@ TABLE = """
 """
 
 PRODUCT_SPEC = {
-    'laptop':{
-        'diagonal':'diagonal',
-        'display':'display',
-        'processor_freq':'processor_freq',
-        'ram':'ram',
-        'video_card':'video_card',
-        'time_without_charge':'time_without_charge',
+    'laptop': {
+        'diagonal': 'diagonal',
+        'display': 'display',
+        'processor_freq': 'processor_freq',
+        'ram': 'ram',
+        'video_card': 'video_card',
+        'time_without_charge': 'time_without_charge',
     },
     'smartphone': {
         'diagonal': 'diagonal',
@@ -44,18 +45,21 @@ PRODUCT_SPEC = {
 
     },
 }
-def get_product_spac(product,model_name):
+
+
+def get_product_spac(product, model_name):
     table_content = ''
-    for name , value in PRODUCT_SPEC[model_name].items():
-        table_content += TABLE.format(name=name, value=getattr(product,value))
+    for name, value in PRODUCT_SPEC[model_name].items():
+        table_content += TABLE.format(name=name, value=getattr(product, value))
     return table_content
+
 
 @register.filter
 def product_spec(product):
     model_name = product.__class__._meta.model_name
-    if isinstance(product,SmartPhone):
+    if isinstance(product, SmartPhone):
         if not product.sd:
             PRODUCT_SPEC['smartphone'].pop('sd_volume_max')
         else:
-            PRODUCT_SPEC['smartphone']['sd_volume_max'] == 'sd_volume_max'
-    return mark_safe(TABLE_HEAD + get_product_spac(product,model_name) + TABLE_TAIL)
+            PRODUCT_SPEC['smartphone']['sd_volume_max'] = 'sd_volume_max'
+    return mark_safe(TABLE_HEAD + get_product_spac(product, model_name) + TABLE_TAIL)

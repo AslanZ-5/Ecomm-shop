@@ -34,7 +34,9 @@
       <td>time_without_charge</td>
       <td>{{product.time_without_charge}}</td>
     </tr>
+    {% if product.sd %}
     <tr>
+
       <td>sd</td>
       <td>{{product.sd}}</td>
     </tr>
@@ -42,6 +44,7 @@
       <td>sd_volume_max</td>
       <td>{{product.sd_volume_max}}</td>
     </tr>
+    {% endif %}
   <tr>
       <td>main_camera_mp</td>
       <td>{{product.main_camera_mp}}</td>

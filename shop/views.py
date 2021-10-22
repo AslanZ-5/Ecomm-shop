@@ -21,7 +21,7 @@ class BaseView(View):
         context = {
             'categories': categories,
             'products': products,
-            'cart':cart,
+            'cart': cart,
 
         }
         return render(request, 'shop/base.html', context)
@@ -64,12 +64,17 @@ class AddCartView(View):
         content_type = ContentType.objects.get(model=ct_model)  # getting model by model name
         product = content_type.model_class().objects.get(
             slug=product_slug)  # getting product from product's model by product slug
-        customer = Customer.objects.get(user=request.user) # getting customer by current user
-        cart = Cart.objects.get(owner=customer, in_order=False) # getting cart by owner which is customer
+        customer = Customer.objects.get(user=request.user)  # getting customer by current user
+        cart = Cart.objects.get(owner=customer, in_order=False)  # getting cart by owner which is customer
         cart_product, created = CartProduct.objects.get_or_create(
-            user=cart.owner, cart=cart, content_type=content_type,object_id=product.id,final_price=product.price
-        ) # creating cart product by data which we got above
-        cart.products.add(cart_product)
+            user=cart.owner, cart=cart, content_type=content_type, object_id=product.id, final_price=product.price
+        )  # creating cart product by data which we got above// get_or_create()
+        # Returns a tuple of (object, created), where object is the retrieved or
+        # created object and created is a boolean
+        # specifying whether a new object was created
+
+        if created:
+            cart.products.add(cart_product)
 
         return HttpResponseRedirect('/cart/')
 
