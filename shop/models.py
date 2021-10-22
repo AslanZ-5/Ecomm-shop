@@ -152,8 +152,8 @@ class Cart(models.Model):
 
 class Customer(models.Model):
     user = models.ForeignKey(User, verbose_name='Customer', on_delete=models.CASCADE)
-    phone = models.CharField(max_length=255, verbose_name='Phone number')
-    address = models.CharField(max_length=250, verbose_name='Customer Address')
+    phone = models.CharField(max_length=255,null=True,blank=True, verbose_name='Phone number')
+    address = models.CharField(max_length=250,null=True,blank=True, verbose_name='Customer Address')
 
     def __str__(self):
         return f'Customer: {self.user.username} '
