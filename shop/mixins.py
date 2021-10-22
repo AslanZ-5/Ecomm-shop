@@ -18,3 +18,11 @@ class CartMixin(View):
                 return cart
             else:
                 cart = Cart.objects.create(owner=customer,)
+        else:
+            cart = Cart.objects.filter(for_anonymous_user=True).first()
+            if cart:
+                return Cart
+            else:
+                cart = Cart.objects.create(for_anonymous_user=True)
+                return cart
+
