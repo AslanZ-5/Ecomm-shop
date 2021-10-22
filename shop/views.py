@@ -62,8 +62,8 @@ class AddCartView(View):
             slug=product_slug)  # getting product from product's model by product slug
         customer = Customer.objects.get(user=request.user) # getting customer by current user
         cart = Cart.objects.get(owner=customer, in_order=False) # getting cart by owner which is customer
-        cart_product = CartProduct.objects.create(
-            user=cart.owner, cart=cart, content_object=product,final_price=product.price
+        cart_product, created = CartProduct.objects.get_or_create(
+            user=cart.owner, cart=cart, content_type=content_type,object_id=product.id,final_price=product.price
         ) # creating cart product by data which we got above
         cart.products.add(cart_product)
 
