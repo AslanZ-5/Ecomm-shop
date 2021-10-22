@@ -11,6 +11,9 @@ from django.contrib.contenttypes.models import ContentType
 class BaseView(View):
 
     def get(self, request, *args, **kwargs):
+        customer = Customer.objects.get(id=request.user.id)
+        print(request.user.id)
+        cart = Cart.objects.get(owner=customer)
         categories = Category.objects.get_categories_for_left_sidebar()
         products = LatestProducts.objects.get_products_for_models(
             'laptop', 'smartphone', with_respect_to='laptop'
@@ -18,6 +21,7 @@ class BaseView(View):
         context = {
             'categories': categories,
             'products': products,
+            'cart':cart,
 
         }
         return render(request, 'shop/base.html', context)
