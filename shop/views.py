@@ -57,15 +57,15 @@ class AddCartView(View):
     def get(self, request, *args, **kwargs):
         ct_model = kwargs.get('ct_model')  # getting model name from url request
         product_slug = kwargs.get('slug')  # getting product's slug from url request
-        content_type = ContentType.objects.get(model=ct_model)  # getting model through model name
+        content_type = ContentType.objects.get(model=ct_model)  # getting model by model name
         product = content_type.model_class().objects.get(
-            slug=product_slug)  # getting product from product's model via product slug
-        customer = Customer.objects.get(user=request.user) # getting customer via current user
+            slug=product_slug)  # getting product from product's model by product slug
+        customer = Customer.objects.get(user=request.user) # getting customer by current user
         cart = Cart.objects.get(owner=customer, in_order=False) # getting cart by owner which is customer
         cart_product = CartProduct.objects.create(
-            user=cart.owner, cart=cart, content_type=product
+            user=cart.owner, cart=cart, content_object=product,final_price=product.price
         ) # creating cart product by data which we got above
-        cart.objects.add(cart_product)
+        cart.products.add(cart_product)
 
         return HttpResponseRedirect('/cart/')
 
