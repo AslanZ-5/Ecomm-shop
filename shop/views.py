@@ -1,19 +1,17 @@
 from django.shortcuts import render
 from django.views.generic import DetailView, View
 from .models import Laptop, SmartPhone, Category, LatestProducts, Customer, Cart, CartProduct
-from .mixins import CategoryDetailMixin
+from .mixins import CategoryDetailMixin, CartMixin
 from django.http import HttpResponseRedirect
 from django.contrib.contenttypes.models import ContentType
 
 
 # def index(request):
 
-class BaseView(View):
+class BaseView(CartMixin,View):
 
     def get(self, request, *args, **kwargs):
-        customer = Customer.objects.get(id=request.user.id)
         print(request.user.id)
-        cart = Cart.objects.get(owner=customer)
         categories = Category.objects.get_categories_for_left_sidebar()
         products = LatestProducts.objects.get_products_for_models(
             'laptop', 'smartphone', with_respect_to='laptop'
@@ -21,7 +19,7 @@ class BaseView(View):
         context = {
             'categories': categories,
             'products': products,
-            'cart': cart,
+            'cart': self.cart,
 
         }
         return render(request, 'shop/base.html', context)
@@ -57,35 +55,32 @@ class CategoryDetailView(CategoryDetailMixin, DetailView):
     slug_url_kwarg = 'slug'
 
 
-class AddCartView(View):
+class AddCartView(CartMixin,View):
     def get(self, request, *args, **kwargs):
         ct_model = kwargs.get('ct_model')  # getting model name from url request
         product_slug = kwargs.get('slug')  # getting product's slug from url request
         content_type = ContentType.objects.get(model=ct_model)  # getting model by model name
         product = content_type.model_class().objects.get(
             slug=product_slug)  # getting product from product's model by product slug
-        customer = Customer.objects.get(user=request.user)  # getting customer by current user
-        cart = Cart.objects.get(owner=customer, in_order=False)  # getting cart by owner which is customer
         cart_product, created = CartProduct.objects.get_or_create(
-            user=cart.owner, cart=cart, content_type=content_type, object_id=product.id, final_price=product.price
+            user=self.cart.owner, cart=self.cart, content_type=content_type, object_id=product.id, final_price=product.price
         )  # creating cart product by data which we got above// get_or_create()
         # Returns a tuple of (object, created), where object is the retrieved or
         # created object and created is a boolean
         # specifying whether a new object was created
 
         if created:
-            cart.products.add(cart_product)
+            self.cart.products.add(cart_product)
 
         return HttpResponseRedirect('/cart/')
 
 
-class CartView(View):
+class CartView(CartMixin,View):
     def get(self, request, *args, **kwargs):
-        customer = Customer.objects.get(user=request.user)
-        cart = Cart.objects.get(owner=customer)
+
         categories = Category.objects.get_categories_for_left_sidebar()
         context = {
-            'cart': cart,
+            'cart': self.cart,
             'categories': categories
         }
         return render(request, 'shop/cart.html', context)
