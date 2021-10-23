@@ -135,7 +135,6 @@ class CartProduct(models.Model):
 
 
 
-
 class Cart(models.Model):
     owner = models.ForeignKey('Customer', null=True, verbose_name='Customer', on_delete=models.CASCADE)
     products = models.ManyToManyField(CartProduct, blank=True, related_name='related_cart')
@@ -156,8 +155,6 @@ class Cart(models.Model):
             self.final_price = 0
         self.total_product = cart_data['qty__sum']
         super().save(*args, **kwargs)
-
-
 
 
 class Customer(models.Model):
@@ -183,6 +180,9 @@ class Laptop(Product):
     def get_absolute_url(self):
         return get_product_url(self, 'product_detail')
 
+    def get_model_name(self):
+        return self.__class__._meta.model_name
+
 
 class SmartPhone(Product):
     diagonal = models.CharField(max_length=255)
@@ -201,3 +201,6 @@ class SmartPhone(Product):
 
     def get_absolute_url(self):
         return get_product_url(self, 'product_detail')
+
+    def get_model_name(self):
+        return self.__class__._meta.model_name

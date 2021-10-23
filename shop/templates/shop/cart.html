@@ -20,7 +20,7 @@
       <td>{{item.content_object.price}} $</td>
       <td>{{item.qty}}</td>
       <td>{{item.final_price}} $</td>
-      <td><a class="btn btn-danger" href="{% url 'remove_from_cart' ct_model=item.content_type.model slug=item.content_object.slug %}">Delete</a></td>
+      <td><a class="btn btn-danger" href="{% url 'remove_from_cart' ct_model=item.content_object.get_model_name slug=item.content_object.slug %}">Delete</a></td>
     </tr>
 {% endfor %}
 

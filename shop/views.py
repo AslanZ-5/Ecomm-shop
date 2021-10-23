@@ -8,7 +8,7 @@ from django.contrib.contenttypes.models import ContentType
 
 # def index(request):
 
-class BaseView(CartMixin,View):
+class BaseView(CartMixin, View):
 
     def get(self, request, *args, **kwargs):
         categories = Category.objects.get_categories_for_left_sidebar()
@@ -54,7 +54,7 @@ class CategoryDetailView(CategoryDetailMixin, DetailView):
     slug_url_kwarg = 'slug'
 
 
-class AddCartView(CartMixin,View):
+class AddCartView(CartMixin, View):
     def get(self, request, *args, **kwargs):
         ct_model = kwargs.get('ct_model')  # getting model name from url request
         product_slug = kwargs.get('slug')  # getting product's slug from url request
@@ -62,36 +62,38 @@ class AddCartView(CartMixin,View):
         product = content_type.model_class().objects.get(
             slug=product_slug)  # getting product from product's model by product slug
         cart_product, created = CartProduct.objects.get_or_create(
-            user=self.cart.owner, cart=self.cart, content_type=content_type, object_id=product.id, final_price=product.price
+            user=self.cart.owner, cart=self.cart, content_type=content_type, object_id=product.id,
+            final_price=product.price
         )  # creating cart product by data which we got above// get_or_create()
         # Returns a tuple of (object, created), where object is the retrieved or
         # created object and created is a boolean
         # specifying whether a new object was created
-
-        if created:
-            self.cart.products.add(cart_product)
+        print(cart_product)
+        print(created)
+        self.cart.products.add(cart_product)
         self.cart.save()
         return HttpResponseRedirect('/cart/')
 
 
-class DeleteCartProductView(CartMixin,View):
+class DeleteCartProductView(CartMixin, View):
     def get(self, request, *args, **kwargs):
         ct_model = kwargs.get('ct_model')  # getting model name from url request
         product_slug = kwargs.get('slug')  # getting product's slug from url request
         content_type = ContentType.objects.get(model=ct_model)  # getting model by model name
         product = content_type.model_class().objects.get(
             slug=product_slug)  # getting product from product's model by product slug
-        cart_product= CartProduct.objects.get(
-            user=self.cart.owner, cart=self.cart, content_type=content_type, object_id=product.id, final_price=product.price
+        cart_product = CartProduct.objects.get(
+            user=self.cart.owner, cart=self.cart, content_type=content_type, object_id=product.id,
+            final_price=product.price
         )  # get cart product by data which we got above
 
         self.cart.products.remove(cart_product)
         self.cart.save()
         return HttpResponseRedirect('/cart/')
 
-class CartView(CartMixin,View):
-    def get(self, request, *args, **kwargs):
 
+class CartView(CartMixin, View):
+    def get(self, request, *args, **kwargs):
         categories = Category.objects.get_categories_for_left_sidebar()
         context = {
             'cart': self.cart,
