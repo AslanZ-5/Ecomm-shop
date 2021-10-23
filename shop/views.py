@@ -74,6 +74,21 @@ class AddCartView(CartMixin,View):
         return HttpResponseRedirect('/cart/')
 
 
+class DeleteCartProductView(CartMixin,View):
+    def get(self, request, *args, **kwargs):
+        ct_model = kwargs.get('ct_model')  # getting model name from url request
+        product_slug = kwargs.get('slug')  # getting product's slug from url request
+        content_type = ContentType.objects.get(model=ct_model)  # getting model by model name
+        product = content_type.model_class().objects.get(
+            slug=product_slug)  # getting product from product's model by product slug
+        cart_product= CartProduct.objects.get(
+            user=self.cart.owner, cart=self.cart, content_type=content_type, object_id=product.id, final_price=product.price
+        )  # get cart product by data which we got above
+
+        self.cart.products.remove(cart_product)
+        self.cart.save()
+        return HttpResponseRedirect('/cart/')
+
 class CartView(CartMixin,View):
     def get(self, request, *args, **kwargs):
 

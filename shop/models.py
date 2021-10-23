@@ -157,7 +157,7 @@ class Cart(models.Model):
         self.total_product = cart_data['qty__sum']
         super().save(*args, **kwargs)
 
-        print(cart_data)
+
 
 
 class Customer(models.Model):
