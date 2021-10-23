@@ -131,11 +131,13 @@ class CartProduct(models.Model):
     def save(self, *args, **kwargs):
         self.final_price = self.qty * self.content_object.price
         super().save(*args, **kwargs)
-a = CartProduct.objects.annotate(models.Count('user'))
+
+
+
 
 
 class Cart(models.Model):
-    owner = models.ForeignKey('Customer',null=True, verbose_name='Customer', on_delete=models.CASCADE)
+    owner = models.ForeignKey('Customer', null=True, verbose_name='Customer', on_delete=models.CASCADE)
     products = models.ManyToManyField(CartProduct, blank=True, related_name='related_cart')
     total_product = models.PositiveIntegerField(default=0)
     final_price = models.DecimalField(max_digits=9, decimal_places=2, default=0, verbose_name='Total Price')
@@ -145,25 +147,23 @@ class Cart(models.Model):
     def __str__(self):
         return str(self.id)
 
-    def save(self,*args,**kwargs):
+    def save(self, *args, **kwargs):
         # take all cartproducts from products, refer to all models final_price row and return their sum
-        cart_data = self.products.aggregate(models.Sum('final_price'),models.Sum('qty'))
+        cart_data = self.products.aggregate(models.Sum('final_price'), models.Sum('qty'))
         if cart_data['final_price__sum']:
             self.final_price = cart_data['final_price__sum']
         else:
             self.final_price = 0
         self.total_product = cart_data['qty__sum']
-        super().save(*args,**kwargs)
-
+        super().save(*args, **kwargs)
 
         print(cart_data)
 
 
-
 class Customer(models.Model):
     user = models.ForeignKey(User, verbose_name='Customer', on_delete=models.CASCADE)
-    phone = models.CharField(max_length=255,null=True,blank=True, verbose_name='Phone number')
-    address = models.CharField(max_length=250,null=True,blank=True, verbose_name='Customer Address')
+    phone = models.CharField(max_length=255, null=True, blank=True, verbose_name='Phone number')
+    address = models.CharField(max_length=250, null=True, blank=True, verbose_name='Customer Address')
 
     def __str__(self):
         return f'Customer: {self.user.username} '
