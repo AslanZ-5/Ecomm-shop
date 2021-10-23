@@ -17,11 +17,17 @@
     <tr>
       <th scope="row">{{ item.content_object.title }}</th>
       <td class="w-25"><img src="{{item.content_object.image.url}}" class="img-fluid"></td>
-      <td>{{item.content_object.price}}</td>
+      <td>{{item.content_object.price}} $</td>
       <td>{{item.qty}}</td>
-      <td>{{item.final_price}}</td>
+      <td>{{item.final_price}} $</td>
     </tr>
 {% endfor %}
+
+    <tr>
+      <th scope="row"><strong>Total</strong></th>
+      <td><strong>Items:   {{cart.total_product}}</strong></td>
+      <td><strong>Sum:   {{cart.final_price}} $</strong></td>
+    </tr>
 
   </tbody>
 </table>

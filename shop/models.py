@@ -50,18 +50,13 @@ class LatestProducts:
 
 
 class CategoryManager(models.Manager):
-    count_names = {
-        'laptop': 'laptop__count',
-        'smartphone': 'smartphone__count',
-    }
-
     def get_queryset(self):
         return super().get_queryset()
 
     def get_categories_for_left_sidebar(self):
         models = get_models_for_count('laptop', 'smartphone')
         qs = list(self.get_queryset().annotate(*models))
-        data = [dict(name=i.name, url=i.get_absolute_url(), count=getattr(i, self.count_names[i.name])) for i in qs]
+        data = [dict(name=i.name, url=i.get_absolute_url(), count=getattr(i, f'{i.name}__count')) for i in qs]
         return data
 
 
@@ -136,6 +131,7 @@ class CartProduct(models.Model):
     def save(self, *args, **kwargs):
         self.final_price = self.qty * self.content_object.price
         super().save(*args, **kwargs)
+a = CartProduct.objects.annotate(models.Count('user'))
 
 
 class Cart(models.Model):
@@ -148,6 +144,20 @@ class Cart(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+    def save(self,*args,**kwargs):
+        # take all cartproducts from products, refer to all models final_price row and return their sum
+        cart_data = self.products.aggregate(models.Sum('final_price'),models.Sum('qty'))
+        if cart_data['final_price__sum']:
+            self.final_price = cart_data['final_price__sum']
+        else:
+            self.final_price = 0
+        self.total_product = cart_data['qty__sum']
+        super().save(*args,**kwargs)
+
+
+        print(cart_data)
+
 
 
 class Customer(models.Model):

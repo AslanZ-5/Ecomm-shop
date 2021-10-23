@@ -11,7 +11,6 @@ from django.contrib.contenttypes.models import ContentType
 class BaseView(CartMixin,View):
 
     def get(self, request, *args, **kwargs):
-        print(request.user.id)
         categories = Category.objects.get_categories_for_left_sidebar()
         products = LatestProducts.objects.get_products_for_models(
             'laptop', 'smartphone', with_respect_to='laptop'
@@ -71,7 +70,7 @@ class AddCartView(CartMixin,View):
 
         if created:
             self.cart.products.add(cart_product)
-
+        self.cart.save()
         return HttpResponseRedirect('/cart/')
 
 
