@@ -68,9 +68,8 @@ class AddCartView(CartMixin, View):
         # Returns a tuple of (object, created), where object is the retrieved or
         # created object and created is a boolean
         # specifying whether a new object was created
-        print(cart_product)
-        print(created)
-        self.cart.products.add(cart_product)
+        if created:
+            self.cart.products.add(cart_product)
 
         return HttpResponseRedirect('/cart/')
 
@@ -88,6 +87,7 @@ class DeleteCartProductView(CartMixin, View):
         )  # get cart product by data which we got above
 
         self.cart.products.remove(cart_product)
+        cart_product.delete()
 
         return HttpResponseRedirect('/cart/')
 
