@@ -1,10 +1,21 @@
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic import View
-from .models import Category, Cart, Customer
+from .models import Category, Cart, Customer,Laptop,SmartPhone
 
 
 class CategoryDetailMixin(SingleObjectMixin):
+    category_slug = {
+        'laptop': Laptop,
+        'smartphone': SmartPhone,
+    }
+
     def get_context_data(self, **kwargs):
+        if isinstance(self.get_object(),Category):
+            model = self.category_slug[self.get_object().slug]
+            context = super().get_context_data(**kwargs)
+            context['categories'] = Category.objects.get_categories_for_left_sidebar()
+            context['products_f'] = model.objects.all()
+            return context
         context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.get_categories_for_left_sidebar()
         return context

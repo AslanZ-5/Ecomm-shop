@@ -5,6 +5,7 @@ from django.contrib import messages
 from .mixins import CategoryDetailMixin, CartMixin
 from django.http import HttpResponseRedirect
 from django.contrib.contenttypes.models import ContentType
+from django.utils.safestring import mark_safe
 
 
 # def index(request):
@@ -25,13 +26,14 @@ class BaseView(CartMixin, View):
         return render(request, 'shop/base.html', context)
 
 
-class ProductDetailView(CategoryDetailMixin, DetailView):
+class ProductDetailView(CategoryDetailMixin, CartMixin, DetailView):
     CT_MODEL = {
         'laptop': Laptop,
         'smartphone': SmartPhone
     }
 
     def dispatch(self, request, *args, **kwargs):
+        print(kwargs['ct_model'])
         self.model = self.CT_MODEL[kwargs['ct_model']]
         self.queryset = self.model._base_manager.all()
         return super().dispatch(request, *args, **kwargs)
@@ -43,16 +45,23 @@ class ProductDetailView(CategoryDetailMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['ct_model'] = self.model._meta.model_name
-
+        context['cart'] = self.cart
         return context
 
 
-class CategoryDetailView(CategoryDetailMixin, DetailView):
+class CategoryDetailView(CategoryDetailMixin, CartMixin, DetailView):
     model = Category
+
     queryset = Category.objects.all()
     context_object_name = 'category'
     template_name = 'shop/category_detail.html'
     slug_url_kwarg = 'slug'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['cart'] = self.cart
+
+        return context
 
 
 class AddCartView(CartMixin, View):
@@ -72,7 +81,9 @@ class AddCartView(CartMixin, View):
         if created:
             self.cart.products.add(cart_product)
 
-        messages.add_message(request,messages.INFO,'Cart Product has been added successfully')
+        messages.add_message(request, messages.INFO,
+                             mark_safe(
+                                 f'<strong style="color:red;">{cart_product.content_object.title} </strong> has been added to cart successfully'))
         return HttpResponseRedirect('/cart/')
 
 
@@ -89,8 +100,8 @@ class DeleteCartProductView(CartMixin, View):
 
         self.cart.products.remove(cart_product)
         cart_product.delete()
-        messages.add_message(request,messages.INFO,'Cart Product has been deleted successfully')
-
+        messages.add_message(request, messages.INFO,
+                             f'{cart_product.content_object.title} has been deleted successfully')
 
         return HttpResponseRedirect('/cart/')
 
@@ -111,7 +122,8 @@ class ChangeQTYView(CartMixin, View):
         cart_product.qty = int(qty)
         cart_product.save()
         self.cart.save()
-        messages.add_message(request,messages.INFO,'The Product quantity has been changed  successfully')
+        messages.add_message(request, messages.INFO,
+                             f'{cart_product.content_object.title} quantity has been changed  successfully')
 
         return HttpResponseRedirect('/cart/')
 
