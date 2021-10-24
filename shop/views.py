@@ -84,8 +84,7 @@ class DeleteCartProductView(CartMixin, View):
         product = content_type.model_class().objects.get(
             slug=product_slug)  # getting product from product's model by product slug
         cart_product = CartProduct.objects.get(
-            user=self.cart.owner, cart=self.cart, content_type=content_type, object_id=product.id,
-            final_price=product.price
+            user=self.cart.owner, cart=self.cart, content_type=content_type, object_id=product.id
         )  # get cart product by data which we got above
 
         self.cart.products.remove(cart_product)
