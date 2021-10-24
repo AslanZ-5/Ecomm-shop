@@ -2,6 +2,13 @@
 
 {% block content %}
 <h1 style="color:red">{{cart}}</h1>
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+     {% if message.tags %}<li style="color:green" class="{{ message.tags }}"><strong>{{ message }}</strong></li>{% endif %}
+    {% endfor %}
+</ul>
+{% endif %}
 <table class="table">
   <thead>
     <tr>
