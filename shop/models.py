@@ -138,7 +138,7 @@ class CartProduct(models.Model):
 class Cart(models.Model):
     owner = models.ForeignKey('Customer', null=True, verbose_name='Customer', on_delete=models.CASCADE)
     products = models.ManyToManyField(CartProduct, blank=True, related_name='related_cart')
-    total_product = models.PositiveIntegerField(default=0)
+    total_product = models.PositiveIntegerField(default=0, null=True)
     final_price = models.DecimalField(max_digits=9, decimal_places=2, default=0, verbose_name='Total Price')
     in_order = models.BooleanField(default=False)
     for_anonymous_user = models.BooleanField(default=False)

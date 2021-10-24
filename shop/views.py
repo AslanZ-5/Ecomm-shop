@@ -71,7 +71,7 @@ class AddCartView(CartMixin, View):
         print(cart_product)
         print(created)
         self.cart.products.add(cart_product)
-        self.cart.save()
+
         return HttpResponseRedirect('/cart/')
 
 
@@ -88,15 +88,17 @@ class DeleteCartProductView(CartMixin, View):
         )  # get cart product by data which we got above
 
         self.cart.products.remove(cart_product)
-        self.cart.save()
+
         return HttpResponseRedirect('/cart/')
 
 
 class CartView(CartMixin, View):
     def get(self, request, *args, **kwargs):
+
         categories = Category.objects.get_categories_for_left_sidebar()
         context = {
             'cart': self.cart,
             'categories': categories
         }
+        self.cart.save()
         return render(request, 'shop/cart.html', context)
