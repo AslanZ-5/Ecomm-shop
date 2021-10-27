@@ -1,5 +1,6 @@
 {% extends 'shop/base.html' %}
 {% block content %}
+{% load crispy_forms_tags %}
 <h1>Check it out</h1>
 
 <table class="table">
@@ -36,6 +37,11 @@
 
 <hr>
 <h1> Order Form</h1>
-{{form}}
+<form action="" method="POST">
+  {{form|crispy}}
+  <input type="submit" class="btn btn-success btn-block mb-3" value="Check">
+</form>
+
+
 
 {% endblock %}
