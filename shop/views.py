@@ -7,6 +7,7 @@ from django.http import HttpResponseRedirect
 from django.contrib.contenttypes.models import ContentType
 from django.utils.safestring import mark_safe
 from .forms import OrderForm
+from .utils import recalc
 
 
 # def index(request):
@@ -126,7 +127,7 @@ class ChangeQTYView(CartMixin, View):
         qty = request.POST.get('qty')
         cart_product.qty = int(qty)
         cart_product.save()
-        self.cart.save()
+        recalc(self.cart)
         messages.add_message(request, messages.INFO,
                              f'{cart_product.content_object.title} quantity has been changed  successfully')
 
@@ -140,7 +141,7 @@ class CartView(CartMixin, View):
             'cart': self.cart,
             'categories': categories
         }
-        self.cart.save()
+        recalc(self.cart)
         return render(request, 'shop/cart.html', context)
 
 
@@ -154,5 +155,31 @@ class CheckoutView(CartMixin, View):
             'categories': categories,
             'form':forms,
         }
-        self.cart.save()
+        recalc(self.cart)
         return render(request, 'shop/checkout.html', context)
+
+
+class MakeOrderView(CartMixin,View):
+
+    def post(self,request,*args,**kwargs):
+        form = OrderForm(request.POST or None)
+        customer = Customer.objects.get(user=request.user)
+        if form.is_valid():
+            new_order = form.save(commit=False)
+            new_order.customer = customer
+            new_order.first_name = form.cleaned_data['first_name']
+            new_order.last_name = form.cleaned_data['last_name']
+            new_order.phone = form.cleaned_data['phone']
+            new_order.address = form.cleaned_data['address']
+            new_order.buying_type = form.cleaned_data['buying_type']
+            new_order.comment = form.cleaned_data['comment']
+            new_order.order_date = form.cleaned_data['order_date']
+            new_order.save()
+            self.cart.in_order = True
+            new_order.cart = self.cart
+            new_order.save()
+            customer.orders.add(new_order)
+
+            messages.add_message(request, messages.INFO, 'Order was added')
+            return HttpResponseRedirect('/')
+        return HttpResponseRedirect('checkout')

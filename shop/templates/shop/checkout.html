@@ -37,7 +37,8 @@
 
 <hr>
 <h1> Order Form</h1>
-<form action="" method="POST">
+<form action="{% url 'new_order' %}" method="POST">
+  {% csrf_token %}
   {{form|crispy}}
   <input type="submit" class="btn btn-success btn-block mb-3" value="Check">
 </form>

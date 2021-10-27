@@ -143,19 +143,9 @@ class Cart(models.Model):
     for_anonymous_user = models.BooleanField(default=False)
 
     def __str__(self):
-        return str(self.id)
+        return f'{self.owner} cart '
 
-    def save(self, *args, **kwargs):
-        # take all cartproducts from products, refer to all models final_price row and return their sum
-        cart_data = self.products.aggregate(models.Sum('final_price'), models.Sum('qty'))
-        if cart_data['final_price__sum']:
-            self.final_price = cart_data['final_price__sum']
-        else:
-            self.final_price = 0
-        self.total_product = cart_data['qty__sum']
-        if self.total_product == None:
-            self.total_product = 0
-        super().save(*args, **kwargs)
+
 
 
 class Customer(models.Model):
@@ -231,6 +221,7 @@ class Order(models.Model):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     phone = models.CharField(max_length=28)
+    cart = models.ForeignKey(Cart,on_delete=models.CASCADE,null=True,blank=True)
     address = models.CharField(max_length=2535,null=True,blank=True)
     status = models.CharField(max_length=255, choices=STATUS_CHOICES, default=STATUS_NEW)
     buying_type = models.CharField(max_length=255,choices=BUYING_TYPE_CHOICES, default=BUYING_TYPE_SELF)
