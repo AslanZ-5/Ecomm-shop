@@ -7,6 +7,7 @@ from io import BytesIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from sys import getsizeof
 from django.urls import reverse
+from django.utils import timezone
 
 
 def get_models_for_count(*model_names):
@@ -136,7 +137,7 @@ class CartProduct(models.Model):
 class Cart(models.Model):
     owner = models.ForeignKey('Customer', null=True, verbose_name='Customer', on_delete=models.CASCADE)
     products = models.ManyToManyField(CartProduct, blank=True, related_name='related_cart')
-    total_product = models.PositiveIntegerField( null=True)
+    total_product = models.PositiveIntegerField(null=True)
     final_price = models.DecimalField(max_digits=9, decimal_places=2, default=0, verbose_name='Total Price')
     in_order = models.BooleanField(default=False)
     for_anonymous_user = models.BooleanField(default=False)
@@ -161,7 +162,7 @@ class Customer(models.Model):
     user = models.ForeignKey(User, verbose_name='Customer', on_delete=models.CASCADE)
     phone = models.CharField(max_length=255, null=True, blank=True, verbose_name='Phone number')
     address = models.CharField(max_length=250, null=True, blank=True, verbose_name='Customer Address')
-
+    orders = models.ManyToManyField('Order' ,max_length=255,related_name='related_customer')
     def __str__(self):
         return f'Customer: {self.user.username} '
 
@@ -204,3 +205,39 @@ class SmartPhone(Product):
 
     def get_model_name(self):
         return self.__class__._meta.model_name
+
+
+class Order(models.Model):
+    STATUS_NEW = 'NEW'
+    STATUS_TM_PROGRESS = 'in_progress'
+    STATUS_READY = 'is_ready'
+    STATUS_COMPLETED = 'completed'
+
+    BUYING_TYPE_SELF = 'pickup'
+    BUYING_TYPE_DELIVERY = 'delivery'
+
+    STATUS_CHOICES = {
+        (STATUS_COMPLETED, 'new order'),
+        (STATUS_TM_PROGRESS,'order in progress'),
+        (STATUS_READY,'order is ready'),
+        (STATUS_COMPLETED, 'order is completed')
+    }
+
+    BUYING_TYPE_CHOICES = {
+        (BUYING_TYPE_DELIVERY,'delivery'),
+        (BUYING_TYPE_SELF, 'pickup')
+    }
+    customer = models.ForeignKey(Customer,related_name='related_orders', on_delete=models.CASCADE)
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    phone = models.CharField(max_length=28)
+    address = models.CharField(max_length=2535,null=True,blank=True)
+    status = models.CharField(max_length=255, choices=STATUS_CHOICES, default=STATUS_NEW)
+    buying_type = models.CharField(max_length=255,choices=BUYING_TYPE_CHOICES, default=BUYING_TYPE_SELF)
+    comment = models.TextField(null=True,blank=True)
+    created_date = models.DateTimeField(auto_now=True)
+    order_date = models.DateField(verbose_name='Order received date',default=timezone.now)
+
+
+    def __str__(self):
+        return str(self.id)

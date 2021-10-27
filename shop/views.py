@@ -72,8 +72,8 @@ class AddCartView(CartMixin, View):
         product = content_type.model_class().objects.get(
             slug=product_slug)  # getting product from product's model by product slug
         cart_product, created = CartProduct.objects.get_or_create(
-            user=self.cart.owner, cart=self.cart, content_type=content_type, object_id=product.id,
-            final_price=product.price
+            user=self.cart.owner, cart=self.cart, content_type=content_type, object_id=product.id
+
         )  # creating cart product by data which we got above// get_or_create()
         # Returns a tuple of (object, created), where object is the retrieved or
         # created object and created is a boolean
@@ -81,9 +81,13 @@ class AddCartView(CartMixin, View):
         if created:
             self.cart.products.add(cart_product)
 
-        messages.add_message(request, messages.INFO,
+            messages.add_message(request, messages.INFO,
+                                 mark_safe(
+                                     f'<strong style="color:red;">{cart_product.content_object.title} </strong> has been added to cart successfully'))
+        else:
+            messages.add_message(request, messages.INFO,
                              mark_safe(
-                                 f'<strong style="color:red;">{cart_product.content_object.title} </strong> has been added to cart successfully'))
+                                 f'<strong style="color:red;">{cart_product.content_object.title} </strong> already exists'))
         return HttpResponseRedirect('/cart/')
 
 
