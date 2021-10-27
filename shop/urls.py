@@ -9,5 +9,6 @@ urlpatterns = [
     path('add-to-cart/<str:ct_model>/<str:slug>/',views.AddCartView.as_view(),name='add_to_cart'),
     path('remove-from-cart/<str:ct_model>/<str:slug>/',views.DeleteCartProductView.as_view(),name='remove_from_cart'),
     path('change-qty/<str:ct_model>/<str:slug>/',views.ChangeQTYView.as_view(),name='qty'),
+    path('checkout/',views.CheckoutView.as_view(),name='checkout'),
 ]
 

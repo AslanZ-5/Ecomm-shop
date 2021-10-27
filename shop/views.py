@@ -141,3 +141,14 @@ class CartView(CartMixin, View):
         }
         self.cart.save()
         return render(request, 'shop/cart.html', context)
+
+
+class CheckoutView(CartMixin, View):
+    def get(self, request, *args, **kwargs):
+        categories = Category.objects.get_categories_for_left_sidebar()
+        context = {
+            'cart': self.cart,
+            'categories': categories
+        }
+        self.cart.save()
+        return render(request, 'shop/checkout.html', context)

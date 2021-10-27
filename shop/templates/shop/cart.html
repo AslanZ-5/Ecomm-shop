@@ -45,6 +45,7 @@
       <th scope="row"><strong>Total</strong></th>
       <td><strong>Items:   {{cart.total_product}}</strong></td>
       <td><strong>Sum:   {{cart.final_price}} $</strong></td>
+      <td><a href="{% url 'checkout' %}"><button class="btn btn-primary">Check it out</button></a></td>
     </tr>
 
   </tbody>
