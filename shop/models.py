@@ -152,7 +152,7 @@ class Customer(models.Model):
     user = models.ForeignKey(User, verbose_name='Customer', on_delete=models.CASCADE)
     phone = models.CharField(max_length=255, null=True, blank=True, verbose_name='Phone number')
     address = models.CharField(max_length=250, null=True, blank=True, verbose_name='Customer Address')
-    orders = models.ManyToManyField('Order' ,max_length=255,related_name='related_customer')
+    orders = models.ManyToManyField('Order' ,max_length=255,blank=True,related_name='related_customer')
     def __str__(self):
         return f'Customer: {self.user.username} '
 
