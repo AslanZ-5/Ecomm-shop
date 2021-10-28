@@ -1,5 +1,5 @@
 from rest_framework.generics import ListAPIView
-from .serializers import CategorySerializer,SmartphoneSerializer
+from .serializers import CategorySerializer,SmartphoneSerializer,LaptopSerializer
 from shop.models import Category,SmartPhone,Laptop
 from rest_framework.filters import SearchFilter
 
@@ -24,3 +24,11 @@ class SmartphoneListAPIView(ListAPIView):
     #         return super().get_queryset().filter(**ww)
     #     else:
     #         return super().get_queryset()
+
+
+
+class LaptopListAPIView(ListAPIView):
+    serializer_class = LaptopSerializer
+    queryset = Laptop.objects.all()
+    filter_backends = [SearchFilter]
+    search_fields = ['price','slug']

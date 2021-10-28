@@ -34,6 +34,20 @@ class SmartphoneSerializer(BaseProductSerializer, serializers.ModelSerializer):
     sd_volume_max = serializers.CharField(required=True)
     main_camera_mp = serializers.CharField(required=True)
     frontal_camera_mp = serializers.CharField()
+
     class Meta:
         model = SmartPhone
+        fields = '__all__'
+
+
+class LaptopSerializer(BaseProductSerializer, serializers.ModelSerializer):
+    diagonal = serializers.CharField(required=True)
+    display = serializers.CharField(required=True)
+    ram = serializers.CharField(required=True)
+    processor_freq = serializers.CharField(required=True)
+    time_without_charge = serializers.CharField(required=True)
+    video_card = serializers.BooleanField(required=True)
+
+    class Meta:
+        model = Laptop
         fields = '__all__'
