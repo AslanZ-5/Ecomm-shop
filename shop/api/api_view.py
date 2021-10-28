@@ -1,5 +1,5 @@
 from rest_framework.generics import ListAPIView, RetrieveAPIView
-from .serializers import CategorySerializer, SmartphoneSerializer, LaptopSerializer
+from .serializers import CategorySerializer, SmartphoneSerializer, LaptopSerializer,CustomerSerializer
 from shop.models import Category, SmartPhone,Customer, Laptop
 from rest_framework.filters import SearchFilter
 
@@ -39,3 +39,6 @@ class SmartphoneAPIDetailView(RetrieveAPIView):
     lookup_field = 'id'
 
 
+class CustomersListAPIView(ListAPIView):
+    serializer_class = CustomerSerializer
+    queryset = Customer.objects.all()

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from shop.models import Category,Order, Customer, SmartPhone, Laptop
+from shop.models import Category, Order, Customer, SmartPhone, Laptop
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -53,5 +53,15 @@ class LaptopSerializer(BaseProductSerializer, serializers.ModelSerializer):
         fields = '__all__'
 
 
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = '__all__'
 
 
+class CustomerSerializer(serializers.ModelSerializer):
+    orders = OrderSerializer(many=True)
+
+    class Meta:
+        model = Customer
+        fields = '__all__'
