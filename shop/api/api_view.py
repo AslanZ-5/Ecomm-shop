@@ -1,12 +1,20 @@
 from rest_framework.generics import ListAPIView, RetrieveAPIView
-from .serializers import CategorySerializer, SmartphoneSerializer, LaptopSerializer,CustomerSerializer
-from shop.models import Category, SmartPhone,Customer, Laptop
+from .serializers import CategorySerializer, SmartphoneSerializer, LaptopSerializer, CustomerSerializer
+from shop.models import Category, SmartPhone, Customer, Laptop
 from rest_framework.filters import SearchFilter
+from rest_framework.pagination import PageNumberPagination
+
+
+class CategoryPagination(PageNumberPagination):
+    page_size = 2
+    page_query_param = 'page_size'
+    max_page_size = 10
 
 
 class CategoryListApiView(ListAPIView):
     serializer_class = CategorySerializer
     queryset = Category.objects.all()
+    pagination_class = CategoryPagination
 
 
 class SmartphoneListAPIView(ListAPIView):
