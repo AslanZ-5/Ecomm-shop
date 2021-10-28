@@ -1,3 +1,5 @@
+from collections import OrderedDict
+from rest_framework.response import Response
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from .serializers import CategorySerializer, SmartphoneSerializer, LaptopSerializer, CustomerSerializer
 from shop.models import Category, SmartPhone, Customer, Laptop
@@ -9,6 +11,14 @@ class CategoryPagination(PageNumberPagination):
     page_size = 2
     page_query_param = 'page_size'
     max_page_size = 10
+
+    def get_paginated_response(self, data):
+        return Response(OrderedDict([
+            ('category_count', self.page.paginator.count),
+            ('next', self.get_next_link()),
+            ('previous', self.get_previous_link()),
+            ('output', data)
+        ]))
 
 
 class CategoryListApiView(ListAPIView):
