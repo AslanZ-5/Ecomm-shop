@@ -1,6 +1,6 @@
 from rest_framework.generics import ListAPIView
 from .serializers import CategorySerializer,SmartphoneSerializer
-from shop.models import Category,SmartPhone
+from shop.models import Category,SmartPhone,Laptop
 
 
 class CategoryListApiView(ListAPIView):
