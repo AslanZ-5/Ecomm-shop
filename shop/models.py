@@ -55,14 +55,11 @@ class CategoryManager(models.Manager):
         return super().get_queryset()
 
     def get_categories_for_left_sidebar(self):
-        model = get_models_for_count('laptop', 'smartphone')
-        # qs = [self.get_queryset().annotate(*model)]
-        # print(qs)
-        # data = [dict(name=i.name, url=i.get_absolute_url(), count=getattr(i, f'{i.name}__count')) for i in qs]
-        # print(data)
-        # print(model)
-        print(self.get_queryset())
-        print('-------',model)
+        models = get_models_for_count('laptop', 'smartphone')
+        qs = list(self.get_queryset().annotate(*models))
+        data = [dict(name=i.name, url=i.get_absolute_url(), count=getattr(i, f'{i.name}__count')) for i in qs]
+        return data
+
 
 class Category(models.Model):
     name = models.CharField(max_length=255, verbose_name='Category Name')
